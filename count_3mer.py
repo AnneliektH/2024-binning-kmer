@@ -4,6 +4,7 @@ import sys
 import csv
 from collections import Counter
 import screed
+import pandas as pd
 
 # calculate reverse complement of a kmer, and return the canonical one (alphabetically smaller)
 def canonkmer(kmer):
@@ -46,6 +47,12 @@ def main(input_fasta, output_csv):
             row = {'read_name': record.name}
             row.update(kmer_counts)
             writer.writerow(row)
+    df = pd.read_csv(output_csv)
+    df = df.set_index(df['read_name'])
+    del df['read_name']
+    row_sums = df.sum(axis=1)
+    normalized_df = df.div(row_sums, axis=0)
+    normalized_df.to_csv(output_csv)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
