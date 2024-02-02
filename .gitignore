@@ -1,6 +1,6 @@
 atlas_*/
 .snakemake
-sourmash_gather.snakemake
+sourmash_gather.smk
 Snakefile
 samples.csv
 bash_commands.md
