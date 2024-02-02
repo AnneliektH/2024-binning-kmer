@@ -1,0 +1,6 @@
+Bin Id	Completeness	Completeness_General	Contamination	Completeness_Specific	Completeness_Model_Used	Translation_Table_Used	Coding_Density	Contig_N50	Average_Gene_Length	Genome_Size	GC_Content	Total_Coding_Sequences	Additional_Notes	Quality_score	Sample
+ERR3211994_maxbin_06_sub	56.86	56.86	4.2	48.01	Gradient Boost (General Model)	11	0.899	1456	201.9409918392969	1070252	0.47	1593	None	35.86	ERR3211994
+ERR3211994_metabat_02	62.56	62.56	12.77	61.53	Gradient Boost (General Model)	11	0.846	2666	192.8887775551102	2723375	0.3	3992	None	-1.289999999999992	ERR3211994
+ERR3211994_metabat_03	87.06	95.48	1.86	87.06	Neural Network (Specific Model)	11	0.898	12656	348.43465045592706	2676965	0.52	2303	None	77.76	ERR3211994
+ERR3211994_metabat_06	30.55	38.03	0.0	30.55	Neural Network (Specific Model)	11	0.92	2500	251.040369088812	708925	0.44	867	None	30.55	ERR3211994
+ERR3211994_metabat_09	87.26	92.48	0.08	87.26	Neural Network (Specific Model)	11	0.9	14701	352.5676923076923	2288084	0.47	1950	None	86.86	ERR3211994

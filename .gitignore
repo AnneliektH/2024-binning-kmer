@@ -1,0 +1,8 @@
+atlas_*/
+.snakemake
+sourmash_gather.snakemake
+Snakefile
+samples.csv
+bash_commands.md
+2024-binning-kmer.code-workspace
+env/
