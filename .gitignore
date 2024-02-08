@@ -6,3 +6,6 @@ samples.csv
 bash_commands.md
 2024-binning-kmer.code-workspace
 env/
+mgmanysearch/
+sourmash_sig/
+fasta_3mer/

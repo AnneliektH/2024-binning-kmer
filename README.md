@@ -1,3 +1,6 @@
+## Todo:
+Cut fasta into smaller bits, use snakefile to map and get mgmanysearch output
+
 How to use sourmash to bin contigs on average abund of kmers, instead of using other bin algorithms?
 
 HackMD: https://hackmd.io/muv86ruLR2aPq17e-72D0A?both
@@ -30,5 +33,10 @@ build csv of frequencies of all 32 canonical 3-mers
 2. Calculate coverage of 15-mers. *need to think about this more*
 abundance sketch the 15 mers. 
 sketch full file –> overall 15-mer abundances
-stream through contigs/reads –> apply abundances from full file to k-mers found in contigs.
+stream through contigs –> apply abundances from full file to k-mers found in contigs.
+
+so we need:
+for each kmer in the dataset, (kmer, number of occurrences of the k-mer) k=15
+for each kmer of a contig, get this num of occurences. 
+
 
