@@ -37,7 +37,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(description='Count canonical 3-mers in a fasta file and write to a CSV file.')
+    p = argparse.ArgumentParser(description='Get whole-file abundances for k-mers each record.')
     p.add_argument('input_fasta', type=str, help='Path to the input fasta file')
     p.add_argument('input_sketch', type=str, help='Path to corresponding sketch size')
     p.add_argument('-k', '--ksize', type=int, default=3, help='K-mer size (default: 3)')
