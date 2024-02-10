@@ -15,6 +15,7 @@ def main(args):
     sig = siglist[0]
     fullfile_mh = sig.minhash.downsample(scaled=args.scaled)
 
+
     # generate fieldnames using hashvals
     fieldnames = ['name'] + list(fullfile_mh.hashes)
 
@@ -27,8 +28,9 @@ def main(args):
         for record in screed.open(args.input_fasta):
             # first get existing hashvals
             mh.add_sequence(record.sequence)
-            # then inflate with fullsig counts
-            kmers_to_ff_count = {hashval: fullfile_mh.hashes[hashval] for hashval in mh.hashes}
+            n_observed = len(mh) # total number kmers in this record
+            # then inflate with fullsig counts but normalize by n kmers in the record
+            kmers_to_ff_count = {hashval: (fullfile_mh.hashes[hashval]/n_observed) for hashval in mh.hashes}
             kmers_to_ff_count['name'] = record.name
             writer.writerow(kmers_to_ff_count)
             mh.copy_and_clear()
