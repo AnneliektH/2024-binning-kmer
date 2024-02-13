@@ -25,7 +25,9 @@ def main(args):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        for record in screed.open(args.input_fasta):
+        for n, record in enumerate(screed.open(args.input_fasta)):
+            if n % 1000 == 0:
+                print(f"processed {n} records")
             # first get existing hashvals
             mh.add_sequence(record.sequence)
             n_observed = len(mh) # total number kmers in this record
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description='Get whole-file abundances for k-mers each record.')
     p.add_argument('input_fasta', type=str, help='Path to the input fasta file')
     p.add_argument('input_sketch', type=str, help='Path to corresponding sketch size')
-    p.add_argument('-k', '--ksize', type=int, default=15, help='k-mer size (default: 15)')
+    p.add_argument('-k', '--ksize', type=int, default=31, help='k-mer size (default: 31)')
     p.add_argument('-s', '--scaled', type=int, default=50, help='Scaled value for MinHash (default: 50)')
     p.add_argument('-o', '--output-csv', type=str, help='Path to the output CSV file')
 
