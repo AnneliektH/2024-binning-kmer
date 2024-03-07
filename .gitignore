@@ -1,12 +1,4 @@
-atlas_*/
 .snakemake
-sourmash_gather.smk
-Snakefile
-samples.csv
-bash_commands.md
+./swine_sra/
 2024-binning-kmer.code-workspace
-env/
-mgmanysearch/
-sourmash_sig/
-fasta_3mer/
-fake_bins/
+bowtie2

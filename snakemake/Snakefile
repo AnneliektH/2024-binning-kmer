@@ -1,0 +1,28 @@
+# imports
+import os
+import pandas as pd
+
+# include snakefiles
+include: "sourmash_gather.smk"
+
+# set configfile with samplenames
+configfile: "config.yaml"
+
+# Load the metadata file
+metadata = pd.read_csv(config['metadata_file_path'], usecols=['Run'])
+
+# Create a list of run ids
+samples = metadata['Run'].tolist()
+
+# Define samples
+SAMPLES = config.get('samples', samples)
+KSIZE = [21,31,51]
+
+wildcard_constraints:
+    sample='\w+',
+
+rule all:
+    input:
+        expand("sourmash/sketch/{sample}.contigs.sig.gz", sample=SAMPLES),
+        expand("sourmash/sketch/{sample}.read1.sig.gz", sample=SAMPLES),
+        expand("sourmash/fgather/{sample}.{ksize}.csv", sample=SAMPLES, ksize=KSIZE)

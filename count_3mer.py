@@ -19,7 +19,7 @@ def canonkmer(kmer):
 # count canonical kmers in a sequence, return counts
 def count3mers(seq):
     counts=Counter()
-    mh = sourmash.MinHash(n=0, ksize=3, scaled=50)
+    mh = sourmash.MinHash(n=0, ksize=3, scaled=10)
     for kmer, hashval in mh.kmers_and_hashes(seq):
         counts[(canonkmer(kmer))] += 1
     return counts

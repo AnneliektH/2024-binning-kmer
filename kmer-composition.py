@@ -52,7 +52,8 @@ def main(args):
             # use sourmash to count abundances
             mh.add_sequence(record.sequence)
             # map hashvals to kmer idents to allow nicer csv headers :)
-            n_observed = len(mh) # total number kmers in this record
+            n_observed = len(mh.hashes) # total number kmers in this record
+            print(n_observed) # gives 0
             if n_observed:
                 kmer_to_count = {hashes_to_kmers[hashval]: (mh.hashes.get(hashval, 0)/n_observed) for hashval in hashes_to_kmers}
                 kmer_to_count['name'] = record.name
