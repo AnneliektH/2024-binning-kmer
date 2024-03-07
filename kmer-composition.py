@@ -4,7 +4,6 @@ import screed
 from itertools import product
 import sourmash
 from sourmash.minhash import hash_murmur
-import pytest
 
 
 def canonical_kmers_and_hashes(ksize):
@@ -48,7 +47,9 @@ def main(args):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        for record in screed.open(args.input_fasta):
+        for n, record in enumerate(screed.open(args.input_fasta)):
+            if n % 1000 == 0:
+                print(f"processed {n} records")
             # use sourmash to count abundances
             mh.add_sequence(record.sequence)
             # map hashvals to kmer idents to allow nicer csv headers :)
@@ -60,11 +61,11 @@ def main(args):
                 writer.writerow(kmer_to_count)
             mh.copy_and_clear()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     p = argparse.ArgumentParser(description='Get kmer composition of each sequence record in a file')
     p.add_argument('input_fasta', type=str, help='Path to the input fasta file')
     p.add_argument('-k', '--ksize', type=int, default=3, help='K-mer size (default: 3)')
-    p.add_argument('-s', '--scaled', type=int, default=50, help='Scaled value for MinHash (default: 50)')
+    p.add_argument('-s', '--scaled', type=int, default=1, help='Scaled value for MinHash (default: 1)')
     p.add_argument('-o', '--output-csv', type=str, help='Path to the output CSV file')
 
     args = p.parse_args()
