@@ -1,5 +1,3 @@
 .snakemake
-./swine_sra/
-2024-binning-kmer.code-workspace
-bowtie2
-metabat_depth*
+results/
+resources/

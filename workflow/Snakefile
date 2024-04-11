@@ -1,0 +1,31 @@
+
+import os.path
+SAMPLE, = glob_wildcards('mgmanysearch/{sample}.gather.csv')
+DBCONTIG = os.path.abspath('mgmanysearch/ERR11351.zip'),
+
+
+# fastmultigather already done: from there go to picklist -> mgmanysearch.
+rule all:
+    input:
+        expand('mgmanysearch/{sample}.mgm.csv', sample=SAMPLE),
+
+rule manifest_smashm:
+    input:
+        fmg='mgmanysearch/{sample}.gather.csv',
+    output:
+        mf='mgmanysearch/{sample}.mf.csv',
+    shell:"""
+    sourmash sig check -k 21 {DBCONTIG} --picklist {input.fmg}:match_md5:md5 -m {output.mf}
+    """
+
+# Do mgmanysearch
+rule do_mgsearch_m:
+    input:
+        sample='mgmanysearch/sketch_reads/{sample}.sig.gz',
+        mf='mgmanysearch/{sample}.mf.csv',
+    output:
+        csv='mgmanysearch/{sample}.mgm.csv'
+    shell: """
+    sourmash scripts mgmanysearch --queries {input.mf} \
+    --against {input.sample} -k 21 --scaled 1000 -o {output.csv} 
+    """
