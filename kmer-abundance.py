@@ -26,7 +26,7 @@ def main(args):
         writer.writeheader()
 
         for n, record in enumerate(screed.open(args.input_fasta)):
-            if n % 1000 == 0:
+            if n % 100 == 0:
                 print(f"processed {n} records")
             # first get existing hashvals
             mh.add_sequence(record.sequence)
