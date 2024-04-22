@@ -1,0 +1,10 @@
+name: branchwater-abund
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pip
+  - python=3.12
+  - pip:
+    - git+https://github.com/sourmash-bio/sourmash_plugin_branchwater@manysearch-add-abund

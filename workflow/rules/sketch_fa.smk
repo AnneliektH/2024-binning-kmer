@@ -20,10 +20,10 @@ rule rocksdb:
         siglist = '../results/sourmash_sketches/split_sig/{sample}.txt',
     conda:
         "branchwater"
-    threads: 1
+    threads: 6
     shell:"""
     readlink -f {input.sig} > {output.siglist} && \
-    sourmash scripts index \
+    sourmash scripts index -c {threads} \
     {output.siglist} -m DNA -k 21 --scaled 100 \
     -o ../results/sourmash_sketches/rocksdb/{wildcards.sample}.rocksdb
     """
