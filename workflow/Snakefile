@@ -1,0 +1,16 @@
+
+import os.path
+# SAMPLE, = glob_wildcards('mgmanysearch/{sample}.gather.csv')
+# DBCONTIG = os.path.abspath('mgmanysearch/ERR11351.zip'),
+MULTIFASTA, = glob_wildcards('../results/sourmash_sketches/split_fa/{sample}.fa')
+# READSKETCH, = glob_wildcards('../results/sourmash_sketches/sketch_reads/{rsketch}.k21.zip')
+# CONTIGSKETCH, = glob_wildcards('../results/sourmash_sketches/rocksdb/{csketch}.rocksdb')
+ 
+include: "rules/sketch_fa.smk"
+include: "rules/fastmultigather.smk"
+
+# final out file
+rule all:
+    input:
+        expand('../results/sourmash_sketches/split_sig/{sample}.txt', sample=MULTIFASTA),
+    #    expand('../results/sourmash/fastmultigather/{rsketch}x{csketch}.csv', rsketch=READSKETCH, csketch=CONTIGSKETCH),
