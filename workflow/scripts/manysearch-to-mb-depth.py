@@ -1,6 +1,6 @@
 import csv
 import argparse
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 def read_manysearch(input_csv, msD, all_queries, contig_abunds):
     with open(input_csv, mode='r') as file:
@@ -15,7 +15,7 @@ def read_manysearch(input_csv, msD, all_queries, contig_abunds):
             msD[contig_name].update(infoD)
     return msD, all_queries, contig_abunds
 
-def write_results(output_tsv, allqueries, msData):
+def write_results(output_tsv, allqueries, msData, contig_lengths, average_abunds):
     # build full list of fields (columns)
     fieldnames = ['contigName', 'contigLen', 'totalAvgDepth']
     query_columns = []
@@ -30,13 +30,21 @@ def write_results(output_tsv, allqueries, msData):
         writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
-        for msInfo in msData.values():
+        # results need to be in the same order as the input fasta, AND all contigs need to be represented, even if there was no abundance info
+        for contig_name, contig_len in contig_lengths.items():
             # init all queries--> 0 to avoid NaNs
-            thisrow = zeroes.copy()
-            # update with info we _do_ have for this contig
-            thisrow.update(msInfo)
-            # write updated row
-            writer.writerow(thisrow)
+            contig_info = zeroes.copy()
+            # update with contig info
+            contig_info['contigName'] = contig_name
+            contig_info['contigLen'] = contig_len
+            total_avg_abund = average_abunds.get(contig_name, 0)
+            contig_info['totalAvgDepth'] = total_avg_abund
+
+            # get manysearch data for this contig, if we have any
+            msInfoRow = msData.get(contig_name)
+            if msInfoRow:
+                contig_info.update(msInfoRow)
+            writer.writerow(contig_info)
 
 
 def main(args):
@@ -49,7 +57,7 @@ def main(args):
     input_files = [line.strip() for line in open(args.input_file_list, 'r')]
 
     # read contig lengths file 
-    contig_lengths = {}
+    contig_lengths = OrderedDict()
     with open(args.lengths, mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:
@@ -63,20 +71,9 @@ def main(args):
     average_abunds = {}
     for contig_name, abunds in contig_abunds.items():
         average_abunds[contig_name] = sum(abunds) / len(abunds) if abunds else 0
-    
-    # store the average abundance for each contig in msData
-    for contig_name, avg_abund in average_abunds.items():
-        # fill out remaining columns for each contig
-        msData[contig_name]['totalAvgDepth'] = avg_abund
-        msData[contig_name]['contigName'] = contig_name
-        if contig_name in contig_lengths:
-            msData[contig_name]['contigLen'] = contig_lengths[contig_name]
-        else:
-            msData[contig_name]['contigLen'] = 0
-            print(f"WARNING: contig {contig_name} not found in contig lengths file.")
          
     # Write final results
-    write_results(args.output_tsv, allqueries, msData)
+    write_results(args.output_tsv, allqueries, msData, average_abunds, contig_lengths)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aggregate data from sourmash branchwater 'manysearch' to a metabat-formatted depth file.")
