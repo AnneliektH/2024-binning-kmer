@@ -15,7 +15,7 @@ def read_manysearch(input_csv, msD, all_queries, contig_abunds):
             msD[contig_name].update(infoD)
     return msD, all_queries, contig_abunds
 
-def write_results(output_csv, allqueries, msData):
+def write_results(output_tsv, allqueries, msData):
     # build full list of fields (columns)
     fieldnames = ['contigName', 'contigLen', 'totalAvgDepth']
     query_columns = []
@@ -26,8 +26,8 @@ def write_results(output_csv, allqueries, msData):
     # initialize all with 0 to avoid missing cols getting set as NaN
     zeroes = {x: 0 for x in query_columns}
     
-    with open(output_csv, mode='w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames, sep='\t')
+    with open(output_tsv, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
         for msInfo in msData.values():
@@ -76,7 +76,7 @@ def main(args):
             print(f"WARNING: contig {contig_name} not found in contig lengths file.")
          
     # Write final results
-    write_results(args.output_csv, allqueries, msData)
+    write_results(args.output_tsv, allqueries, msData)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aggregate data from sourmash branchwater 'manysearch' to a metabat-formatted depth file.")
