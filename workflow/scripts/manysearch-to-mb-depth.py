@@ -22,13 +22,21 @@ def write_results(output_csv, allqueries, msData):
     for query_name in allqueries:
         query_columns.extend([f"{query_name}", f"{query_name}-var"])
     fieldnames.extend(query_columns)
+
+    # initialize all with 0 to avoid missing cols getting set as NaN
+    zeroes = {x: 0 for x in query_columns}
     
     with open(output_csv, mode='w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=fieldnames, sep='\t')
         writer.writeheader()
 
         for msInfo in msData.values():
-            writer.writerow(msInfo)
+            # init all queries--> 0 to avoid NaNs
+            thisrow = zeroes.copy()
+            # update with info we _do_ have for this contig
+            thisrow.update(msInfo)
+            # write updated row
+            writer.writerow(thisrow)
 
 
 def main(args):
@@ -73,7 +81,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aggregate data from sourmash branchwater 'manysearch' to a metabat-formatted depth file.")
     parser.add_argument('input_file_list', type=str, help='File containing the list of input CSV files')
-    parser.add_argument('-o', '--output_csv', type=str, help='Path to the output CSV file', required=True)
+    parser.add_argument('-o', '--output_tsv', type=str, help='Path to the output TSV file', required=True)
     parser.add_argument('--lengths', type=str, help='Path to the output CSV file', required=True)
 
     args = parser.parse_args()
