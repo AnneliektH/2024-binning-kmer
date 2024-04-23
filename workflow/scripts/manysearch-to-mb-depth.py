@@ -25,7 +25,7 @@ def write_results(output_tsv, allqueries, msData, contig_lengths, average_abunds
 
     # initialize all with 0 to avoid missing cols getting set as NaN
     zeroes = {x: 0 for x in query_columns}
-    
+
     with open(output_tsv, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
@@ -48,7 +48,7 @@ def write_results(output_tsv, allqueries, msData, contig_lengths, average_abunds
 
 
 def main(args):
-    
+
     msData = defaultdict(dict)
     allqueries = set()
     contig_abunds = defaultdict(list)
@@ -56,7 +56,7 @@ def main(args):
     # read the list of input CSV files
     input_files = [line.strip() for line in open(args.input_file_list, 'r')]
 
-    # read contig lengths file 
+    # read contig lengths file
     contig_lengths = OrderedDict()
     with open(args.lengths, mode='r') as file:
         reader = csv.DictReader(file)
@@ -71,9 +71,9 @@ def main(args):
     average_abunds = {}
     for contig_name, abunds in contig_abunds.items():
         average_abunds[contig_name] = sum(abunds) / len(abunds) if abunds else 0
-         
+
     # Write final results
-    write_results(args.output_tsv, allqueries, msData, average_abunds, contig_lengths)
+    write_results(args.output_tsv, allqueries, msData, contig_lengths, average_abunds)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aggregate data from sourmash branchwater 'manysearch' to a metabat-formatted depth file.")
