@@ -1,16 +1,83 @@
-
 import os.path
-# SAMPLE, = glob_wildcards('mgmanysearch/{sample}.gather.csv')
 # DBCONTIG = os.path.abspath('mgmanysearch/ERR11351.zip'),
-MULTIFASTA, = glob_wildcards('../results/sourmash_sketches/split_fa/{sample}.fa')
-READSKETCH, = glob_wildcards('../results/sourmash_sketches/sketch_reads/{rsketch}.k21.zip')
-CONTIGSKETCH, = glob_wildcards('../results/sourmash_sketches/rocksdb/{csketch}.rocksdb')
- 
-include: "rules/sketch_fa.smk"
-include: "rules/fastmultigather.smk"
+MANYSEARCH_OUT, = glob_wildcards('../results/manysearch/all_reads_allcontigs/{manysearch}.csv')
+INTERSECT_HASHES = [3,5,7,10]
+
+
+# include snakefiles
+# include: "rules/vamb.smk"
+# include: "rules/metabat2.smk"
 
 # final out file
 rule all:
     input:
-        expand('../results/sourmash_sketches/split_sig/{sample}.txt', sample=MULTIFASTA),
-        expand('../results/sourmash/fastmultigather/{rsketch}x{csketch}.csv', rsketch=READSKETCH, csketch=CONTIGSKETCH),
+        expand('../results/checkm/check/checkm_{manysearch}.h{intersect_hash}.mb2.95.done.txt', manysearch=MANYSEARCH_OUT, intersect_hash=INTERSECT_HASHES),
+        # expand('../results/checkm/checkm_{manysearch}.h{intersect_hash}.vamb.done.txt', manysearch=MANYSEARCH_OUT, intersect_hash=INTERSECT_HASHES),
+
+# rule filter on hashes
+rule filter_hash:
+    input:
+        manysearch='../results/manysearch/all_reads_allcontigs/{manysearch}.csv',
+    output:
+        hash_sep='../results/manysearch/hash_tresh/{manysearch}.h{intersect_hash}.csv',
+        ani_tresh='../results/manysearch/hash_tresh/{manysearch}.h{intersect_hash}.95.csv',
+    conda:
+        "csvtk"
+    threads: 1
+    shell:"""
+    csvtk filter -f "intersect_hashes>{wildcards.intersect_hash}" \
+    {input.manysearch} > {output.hash_sep} && \
+    csvtk filter -f "match_containment_ani>0.95" \
+    {output.hash_sep} > {output.ani_tresh}
+    """
+
+# manysearch-to-mb-depth
+rule manysearch_to_depth:
+    input:
+        manysearch='../results/manysearch/hash_tresh/{manysearch}.h{intersect_hash}.95.csv',
+    output:
+        depthf='../results/depth_files/{manysearch}.h{intersect_hash}.95.depth.csv',
+        mnslist = '../results/manysearch/all_reads_allcontigs/{manysearch}.h{intersect_hash}.filelist.txt'
+    conda:
+        "branchwater-abund"
+    threads: 1
+    shell:"""
+    readlink -f {input.manysearch} > {output.mnslist} 
+    python scripts/manysearch-to-mb-depth.py \
+    {output.mnslist} --lengths ../results/depth_files/contig_lengths.csv \
+    -o {output.depthf}
+    """
+
+# rule metabat
+rule metabat:
+    input:
+        depthf='../results/depth_files/{manysearch}.h{intersect_hash}.95.depth.csv',
+        fasta = '../resources/ERR11351.fasta'
+    output:
+        check='../results/metabat2/check/{manysearch}.h{intersect_hash}.95.done.txt',
+    conda:
+        "metabat2"
+    threads: 8
+    shell:"""
+    metabat2 -m 1500 \
+    -i {input.fasta} -a {input.depthf} -t {threads} \
+    -o ../results/metabat2/{wildcards.manysearch}.h{wildcards.intersect_hash}.95/{wildcards.manysearch}.h{wildcards.intersect_hash}.95 && \
+    touch {output.check}
+    """
+
+# rule checkm
+rule checkm2:
+    input:
+        metabat ='../results/metabat2/check/{manysearch}.h{intersect_hash}.95.done.txt'
+    output:
+        check='../results/checkm/check/checkm_{manysearch}.h{intersect_hash}.mb2.95.done.txt',
+    conda:
+        "checkm2"
+    threads: 8
+    shell:"""
+    checkm2 predict --threads {threads} --force \
+    --input ../results/metabat2/{wildcards.manysearch}.h{wildcards.intersect_hash}.95/ \
+    -x .fa --output-directory ../results/checkm/metabat2/{wildcards.manysearch}.h{wildcards.intersect_hash}.95/ && \
+    touch {output.check}
+    """
+
