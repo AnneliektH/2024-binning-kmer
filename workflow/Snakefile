@@ -1,7 +1,7 @@
 import os.path
 # DBCONTIG = os.path.abspath('mgmanysearch/ERR11351.zip'),
-MANYSEARCH_OUT, = glob_wildcards('../results/manysearch/all_reads_allcontigs/{manysearch}.csv')
-INTERSECT_HASHES = [3,5,7,10]
+MANYSEARCH_OUT, = glob_wildcards('../results/manysearch/scaled_50/{manysearch}.csv')
+INTERSECT_HASHES = [3,5,7,8,10]
 
 
 # include snakefiles
@@ -17,7 +17,7 @@ rule all:
 # rule filter on hashes
 rule filter_hash:
     input:
-        manysearch='../results/manysearch/all_reads_allcontigs/{manysearch}.csv',
+        manysearch='../results/manysearch/scaled_50/{manysearch}.csv',
     output:
         hash_sep='../results/manysearch/hash_tresh/{manysearch}.h{intersect_hash}.csv',
         ani_tresh='../results/manysearch/hash_tresh/{manysearch}.h{intersect_hash}.95.csv',
@@ -57,7 +57,7 @@ rule metabat:
         check='../results/metabat2/check/{manysearch}.h{intersect_hash}.95.done.txt',
     conda:
         "metabat2"
-    threads: 8
+    threads: 12
     shell:"""
     metabat2 -m 1500 \
     -i {input.fasta} -a {input.depthf} -t {threads} \
@@ -73,7 +73,7 @@ rule checkm2:
         check='../results/checkm/check/checkm_{manysearch}.h{intersect_hash}.mb2.95.done.txt',
     conda:
         "checkm2"
-    threads: 8
+    threads: 12
     shell:"""
     checkm2 predict --threads {threads} --force \
     --input ../results/metabat2/{wildcards.manysearch}.h{wildcards.intersect_hash}.95/ \
